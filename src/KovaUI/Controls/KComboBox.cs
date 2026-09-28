@@ -18,8 +18,9 @@ public class KComboBox : ComboBox, IKThemeControl
     private bool hover;
     private int radius = 8, border = 1;
     private Font? defaultFont;
+    [TypeConverter(typeof(KFontConverter))]
     [System.Diagnostics.CodeAnalysis.AllowNull]
-    public override Font Font { get => base.Font; set => base.Font = value ?? defaultFont; }
+    public override Font Font { get => base.Font; set => base.Font = KFontManager.ResolveFont(value, defaultFont); }
     public override void ResetFont() => Font = null;
     private bool ShouldSerializeFont() => !Equals(Font, defaultFont);
     public KComboBox()

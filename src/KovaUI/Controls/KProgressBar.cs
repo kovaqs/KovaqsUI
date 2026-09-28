@@ -14,8 +14,9 @@ public class KProgressBar : ProgressBar, IKThemeControl
     private int radius = 8, border;
     private long marqueeStart = Stopwatch.GetTimestamp();
     private Font? defaultFont;
+    [TypeConverter(typeof(KFontConverter))]
     [System.Diagnostics.CodeAnalysis.AllowNull]
-    public override Font Font { get => base.Font; set => base.Font = value ?? defaultFont; }
+    public override Font Font { get => base.Font; set => base.Font = KFontManager.ResolveFont(value, defaultFont); }
     public override void ResetFont() => Font = null;
     private bool ShouldSerializeFont() => !Equals(Font, defaultFont);
     public KProgressBar()

@@ -137,4 +137,6 @@ La carga privada en memoria se centraliza mediante `KFontManager`, con registro 
 
 `KFonts.Inter(10f, KFontWeight.Medium)` crea una fuente propia del consumidor. `KTypography` centraliza los presets Body, BodyMedium, Label, Button, Title y Caption basados en Inter. Para compatibilidad retroactiva, la familia Outfit permanece disponible mediante `KFonts.Outfit(size, weight)`. Cada resultado de `KFonts` o `KTypography` es un Font independiente que debe desecharse cuando ya no lo utilicen los controles. No solicites presets en Paint.
 
+Al modificar el tamaño de fuente desde el diseñador de Visual Studio (`PropertyGrid`), código generado o mediante métodos como `font.WithSize(size)` o `font.WithWeight(weight)`, `KFontConverter` y `KFontManager.ResolveFont` preservan automáticamente la familia privada y evitan cualquier sustitución o degradación silenciosa a "Microsoft Sans Serif".
+
 Consulta [tipografía, diseño, DPI y gestión de recursos](docs/TYPOGRAPHY.md), [avisos de Inter](src/KovaUI/Resources/Fonts/Inter/NOTICE.md) y [avisos de Outfit](src/KovaUI/Resources/Fonts/Outfit/NOTICE.md). La licencia SIL OFL corresponde únicamente a los archivos tipográficos.

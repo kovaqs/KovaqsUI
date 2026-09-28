@@ -58,6 +58,7 @@ public class KLabel : Label, IKThemeControl
     public override void ResetForeColor() => ForeColor = Color.Empty;
     private bool ShouldSerializeForeColor() => !customColor.IsEmpty;
 
+    [TypeConverter(typeof(KFontConverter))]
     [AllowNull]
     public override Font Font
     {
@@ -65,7 +66,7 @@ public class KLabel : Label, IKThemeControl
         set
         {
             customFont = value is not null;
-            if (customFont) base.Font = value;
+            if (customFont) base.Font = KFontManager.ResolveFont(value, roleFont);
             else ApplyTypography();
         }
     }

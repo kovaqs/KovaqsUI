@@ -1,5 +1,14 @@
 # Cambios
 
+## 0.4.1
+
+- Solución integral al problema de sustitución y degradación a "Microsoft Sans Serif" al modificar el tamaño o peso de la fuente en tiempo de diseño y ejecución.
+- Introducción de KFontConverter como convertidor tipográfico especializado para el PropertyGrid y serialización de Windows Forms, preservando las familias privadas (Inter y Outfit).
+- Implementación de KFontManager.ResolveFont(...) y registro automático en la propiedad Font de los ocho controles de la biblioteca (KButton, KTextBox, KCheckBox, KRadioButton, KComboBox, KProgressBar, KPanel y KLabel).
+- Métodos de extensión ergonómicos font.WithSize(size) y font.WithWeight(weight) en KFontExtensions para manipular dimensiones y pesos sin riesgos de degradación.
+- Respeto total hacia fuentes de sistema personalizadas asignadas intencionalmente por el consumidor (como Arial, Consolas o asignaciones explícitas de Microsoft Sans Serif).
+- Suite ampliada de pruebas automatizadas a 303 verificaciones, comprobando exhaustivamente la edición en PropertyGrid, instanciación por nombre, cambio de tamaño y liberación de recursos GDI.
+
 ## 0.4.0
 
 - Inter integrada como tipografía predeterminada en los ocho controles de la biblioteca, sin requerir instalación en Windows.

@@ -19,8 +19,9 @@ public class KTextBox : UserControl, IKThemeControl
     private Rectangle leftBounds, rightBounds;
     private Color normalForeColor;
     private Font? defaultFont;
+    [TypeConverter(typeof(KFontConverter))]
     [System.Diagnostics.CodeAnalysis.AllowNull]
-    public override Font Font { get => base.Font; set => base.Font = value ?? defaultFont; }
+    public override Font Font { get => base.Font; set => base.Font = KFontManager.ResolveFont(value, defaultFont); }
     public override void ResetFont() => Font = null;
     private bool ShouldSerializeFont() => !Equals(Font, defaultFont);
     public KTextBox()
@@ -225,7 +226,7 @@ public class KTextBox : UserControl, IKThemeControl
     protected override void OnMouseLeave(EventArgs e) { hover = ClientRectangle.Contains(PointToClient(MousePosition)); base.OnMouseLeave(e); RefreshStyle(); }
     protected override void OnSizeChanged(EventArgs e) { base.OnSizeChanged(e); LayoutEditor(); }
     protected override void OnPaddingChanged(EventArgs e) { base.OnPaddingChanged(e); LayoutEditor(); }
-    protected override void OnFontChanged(EventArgs e) { base.OnFontChanged(e); LayoutEditor(); }
+    protected override void OnFontChanged(EventArgs e) { base.OnFontChanged(e); if (editor is not null) editor.Font = Font; LayoutEditor(); }
     protected override void OnForeColorChanged(EventArgs e) { base.OnForeColorChanged(e); RefreshStyle(); }
     protected override void OnEnabledChanged(EventArgs e) { pressed = false; base.OnEnabledChanged(e); RefreshStyle(); }
     protected override void OnTabStopChanged(EventArgs e)

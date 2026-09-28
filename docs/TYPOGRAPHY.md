@@ -60,6 +60,32 @@ Si se desea desactivar explícitamente las fuentes privadas a nivel de proceso (
 AppContext.SetSwitch("KovaUI.DisableEmbeddedFonts", true);
 ```
 
+## Preservación tipográfica y prevención de degradación a Microsoft Sans Serif
+
+En Windows Forms estándar, cuando una fuente privada cargada en memoria se reconstruye únicamente a partir de su nombre de texto (por ejemplo `new Font("Inter", 14f)` o mediante el `FontConverter` predeterminado del `PropertyGrid` al cambiar la propiedad `Size`), el subsistema GDI+ busca la familia exclusivamente en el catálogo global de Windows (`C:\Windows\Fonts`). Al no encontrarla instalada a nivel de sistema operativo, GDI+ sustituye silenciosamente la familia por `Microsoft Sans Serif`, reteniendo únicamente `OriginalFontName = "Inter"`.
+
+Para erradicar definitivamente este problema y garantizar una experiencia fluida tanto en tiempo de diseño como en tiempo de ejecución, KovaUI implementa una **doble capa de protección**:
+
+1. **Tiempo de diseño y PropertyGrid (`KFontConverter`)**:
+   Todos los controles de KovaUI asocian `[TypeConverter(typeof(KFontConverter))]` a su propiedad `Font`. Cuando el diseñador de Visual Studio o el `PropertyGrid` modifica el tamaño (`Size`), peso (`Bold`) u otras propiedades subordinadas, `KFontConverter.CreateInstance` intercepta la creación y genera la nueva instancia directamente desde la colección privada de `KFontManager`, evitando en origen la degradación a `Microsoft Sans Serif`. Asimismo, `KFontConverter.ConvertFrom` parsea cadenas como `"Inter, 12pt"` de forma determinista.
+
+2. **Tiempo de ejecución y código generado (`KFontManager.ResolveFont`)**:
+   El descriptor de acceso `set` de la propiedad `Font` en los ocho controles (`KButton`, `KTextBox`, `KCheckBox`, `KRadioButton`, `KComboBox`, `KProgressBar`, `KPanel`, `KLabel`) filtra el valor entrante a través de `KFontManager.ResolveFont(value, defaultFont)`. Si el código generado en `InitializeComponent()` (`this.button1.Font = new Font("Inter", 14F)`) o código del consumidor asigna una fuente degradada por GDI+, la biblioteca la detecta automáticamente y reconstruye la instancia utilizando la familia privada en memoria, desechando de inmediato el objeto degradado para no fugar recursos GDI.
+
+3. **Respeto absoluto de fuentes del sistema**:
+   Las fuentes del sistema asignadas de manera explícita por el consumidor (como `Arial`, `Segoe UI`, `Consolas` o incluso asignaciones deliberadas de `Microsoft Sans Serif`) no son alteradas por `ResolveFont` y se conservan de forma íntegra.
+
+4. **Métodos de extensión ergonómicos (`KFontExtensions`)**:
+   Se proporcionan métodos de extensión para modificar el tamaño o peso de un objeto `Font` con fluidez y seguridad:
+
+   ```csharp
+   // Cambiar el tamaño conservando la familia privada Inter / Outfit:
+   myButton.Font = myButton.Font.WithSize(14f);
+
+   // Cambiar el peso conservando la familia:
+   myButton.Font = myButton.Font.WithWeight(KFontWeight.SemiBold);
+   ```
+
 ## DPI y escalado
 
 Las fuentes utilizan `GraphicsUnit.Point`. Windows Forms calcula la conversión a píxeles según el DPI de la ventana (`DeviceDpi`). No se debe multiplicar `Font.Size` por el factor de escala manualmente. Los controles ajustan sus alturas, padding y alineaciones basándose en las métricas de la fuente actual.

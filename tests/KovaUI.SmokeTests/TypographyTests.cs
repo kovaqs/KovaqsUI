@@ -57,6 +57,96 @@ internal static class TypographyTests
         check(field.Editor.Font.Equals(field.Font), "native text editor inherits Inter");
         check(KFonts.InterLicense.Contains("The Inter Project Authors") && KFonts.InterLicense.Contains("SIL OPEN FONT LICENSE"), "standalone DLL exposes original Inter font notices");
         check(KFonts.OutfitLicense.Contains("Copyright 2021 The Outfit Project Authors") && KFonts.OutfitLicense.Contains("SIL OPEN FONT LICENSE"), "standalone DLL exposes original Outfit font notices");
+
+        // Pruebas de preservación tipográfica al cambiar tamaño y peso (evitar degradación a Microsoft Sans Serif)
+        var converter = new KFontConverter();
+
+        // 1. Simulación de PropertyGrid cambiando tamaño de fuente privada
+        var propValues = new System.Collections.Hashtable
+        {
+            ["Name"] = "Inter",
+            ["Size"] = 14f,
+            ["Unit"] = GraphicsUnit.Point,
+            ["Bold"] = false,
+            ["Italic"] = false,
+            ["Strikeout"] = false,
+            ["Underline"] = false
+        };
+        using (var convertedFont = (Font)converter.CreateInstance(null, propValues))
+        {
+            check(convertedFont.Name == "Inter" && Math.Abs(convertedFont.Size - 14f) < 0.01f,
+                "KFontConverter.CreateInstance preserva Inter al cambiar tamaño a 14pt");
+        }
+
+        // 2. Simulación de PropertyGrid con peso Medium
+        propValues["Name"] = "Inter Medium";
+        propValues["Size"] = 16f;
+        using (var mediumFont = (Font)converter.CreateInstance(null, propValues))
+        {
+            check(mediumFont.Name == "Inter Medium" && Math.Abs(mediumFont.Size - 16f) < 0.01f,
+                "KFontConverter.CreateInstance preserva Inter Medium al cambiar tamaño a 16pt");
+        }
+
+        // 3. Simulación de PropertyGrid con Outfit
+        propValues["Name"] = "Outfit";
+        propValues["Size"] = 18f;
+        using (var outfitFont = (Font)converter.CreateInstance(null, propValues))
+        {
+            check(outfitFont.Name == "Outfit" && Math.Abs(outfitFont.Size - 18f) < 0.01f,
+                "KFontConverter.CreateInstance preserva Outfit al cambiar tamaño a 18pt");
+        }
+
+        // 4. ConvertFrom desde texto
+        using (var parsedInter = (Font)converter.ConvertFrom(null, null, "Inter, 13pt")!)
+        {
+            check(parsedInter.Name.StartsWith("Inter") && Math.Abs(parsedInter.Size - 13f) < 0.01f,
+                "KFontConverter.ConvertFrom('Inter, 13pt') preserva Inter");
+        }
+
+        // 5. Verificación de TypeConverter y resolución en cada control
+        foreach (var control in controls)
+        {
+            var prop = TypeDescriptor.GetProperties(control)["Font"]!;
+            check(prop.Converter is KFontConverter, $"{control.GetType().Name} declara KFontConverter como convertidor de Font");
+
+            // Simulación de código generado por diseñador o usuario: new Font("Inter", 15f)
+            // En un sistema sin Inter instalada, new Font("Inter", 15f) tiene Name == "Microsoft Sans Serif"
+            using var rawDegraded = new Font("Inter", 15f);
+            if (!installedInter)
+            {
+                check(rawDegraded.Name == "Microsoft Sans Serif" && rawDegraded.OriginalFontName == "Inter",
+                    "GDI+ efectivamente degrada new Font('Inter') a Microsoft Sans Serif en ausencia de instalación en Windows");
+            }
+            control.Font = rawDegraded;
+            check(control.Font.Name.StartsWith("Inter") && Math.Abs(control.Font.Size - 15f) < 0.01f,
+                $"{control.GetType().Name}.Font repara automáticamente la degradación a Microsoft Sans Serif restaurando Inter");
+
+            // Simulación de new Font(control.Font.Name, 17f)
+            using var fromName = new Font(control.Font.Name, 17f);
+            control.Font = fromName;
+            check(control.Font.Name.StartsWith("Inter") && Math.Abs(control.Font.Size - 17f) < 0.01f,
+                $"{control.GetType().Name}.Font preserva Inter al reconstruir mediante new Font(control.Font.Name, 17f)");
+
+            // Métodos de extensión WithSize y WithWeight
+            using var resized = control.Font.WithSize(20f);
+            control.Font = resized;
+            check(control.Font.Name.StartsWith("Inter") && Math.Abs(control.Font.Size - 20f) < 0.01f,
+                $"{control.GetType().Name}.Font.WithSize(20f) aplica tamaño preservando Inter");
+
+            using var weighted = control.Font.WithWeight(KFontWeight.Bold);
+            control.Font = weighted;
+            check(control.Font.Name.StartsWith("Inter") && control.Font.Bold,
+                $"{control.GetType().Name}.Font.WithWeight(Bold) aplica peso en negrita");
+
+            // Asignación intencional de Microsoft Sans Serif debe respetarse
+            using var intentionalMsSans = new Font("Microsoft Sans Serif", 9f);
+            control.Font = intentionalMsSans;
+            check(control.Font.Name == "Microsoft Sans Serif" && Math.Abs(control.Font.Size - 9f) < 0.01f,
+                $"{control.GetType().Name}.Font respeta asignación deliberada de Microsoft Sans Serif");
+
+            // Reset restores default
+            prop.ResetValue(control);
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
