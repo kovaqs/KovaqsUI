@@ -127,12 +127,14 @@ La comprobación manual del diseñador realizada por el usuario se acepta. No se
 
 Los títulos y textos de las demos ahora usan KLabel, disponible en la misma DLL y en el Toolbox. Hereda de Label y conserva AutoSize, AutoEllipsis, TextAlign, Image, UseMnemonic, Padding y el comportamiento nativo.
 
-TextRole ofrece Body, Title, Subtitle, Caption y Section con los presets de KTypography y Outfit integrada. Font y ForeColor siguen siendo editables: los valores explícitos se conservan al cambiar el tema o el rol. Restablecer Font recupera la tipografía del rol; restablecer ForeColor recupera el color del tema. El fondo es transparente por defecto. Las muestras se pueden editar desde Personalizar….
+TextRole ofrece Body, Title, Subtitle, Caption y Section con los presets de KTypography e Inter integrada. Font y ForeColor siguen siendo editables: los valores explícitos se conservan al cambiar el tema o el rol. Restablecer Font recupera la tipografía del rol; restablecer ForeColor recupera el color del tema. El fondo es transparente por defecto. Las muestras se pueden editar desde Personalizar….
 
-## Outfit integrada (0.3)
+## Inter integrada por defecto (0.4)
 
-Todos los controles utilizan Outfit sin instalar fuentes en Windows. Los cuatro pesos estáticos y los avisos originales de la fuente viajan dentro de la DLL; el paquete incluye también los avisos como archivos. La carga privada se realiza una sola vez y dispone de fallback Segoe UI.
+Todos los controles utilizan **Inter** como fuente predeterminada sin necesidad de instalar fuentes en Windows. Sus cuatro pesos estáticos oficiales (Regular, Medium, SemiBold y Bold) y sus avisos de licencia SIL OFL viajan dentro de la DLL y el paquete NuGet.
 
-`KFonts.Outfit(10f, KFontWeight.Medium)` crea una fuente propia del consumidor. `KTypography` centraliza los presets Body, BodyMedium, Label, Button, Title y Caption. Cada resultado es un Font independiente que debe desecharse cuando ya no lo utilicen los controles. No solicites presets en Paint.
+La carga privada en memoria se centraliza mediante `KFontManager`, con registro dual para GDI+ (`PrivateFontCollection`) y GDI (`AddFontMemResourceEx`), garantizando renderizado nítido en el editor nativo de texto (`KTextBox`), combos y botones, con respaldo automático a Segoe UI.
 
-Consulta [tipografía, diseño, DPI y gestión de recursos](docs/TYPOGRAPHY.md) y [avisos de Outfit](src/KovaUI/Resources/Fonts/Outfit/NOTICE.md). La licencia de Outfit corresponde únicamente a los archivos tipográficos.
+`KFonts.Inter(10f, KFontWeight.Medium)` crea una fuente propia del consumidor. `KTypography` centraliza los presets Body, BodyMedium, Label, Button, Title y Caption basados en Inter. Para compatibilidad retroactiva, la familia Outfit permanece disponible mediante `KFonts.Outfit(size, weight)`. Cada resultado de `KFonts` o `KTypography` es un Font independiente que debe desecharse cuando ya no lo utilicen los controles. No solicites presets en Paint.
+
+Consulta [tipografía, diseño, DPI y gestión de recursos](docs/TYPOGRAPHY.md), [avisos de Inter](src/KovaUI/Resources/Fonts/Inter/NOTICE.md) y [avisos de Outfit](src/KovaUI/Resources/Fonts/Outfit/NOTICE.md). La licencia SIL OFL corresponde únicamente a los archivos tipográficos.

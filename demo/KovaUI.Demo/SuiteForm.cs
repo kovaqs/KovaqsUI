@@ -12,7 +12,7 @@ internal sealed class SuiteForm : Form
     private int quantity = 3;
     private bool dark;
     private readonly Font demoFont = KTypography.Body;
-    private readonly Font counterFont = KFonts.Outfit(13, KFontWeight.SemiBold);
+    private readonly Font counterFont = KFonts.Inter(13, KFontWeight.SemiBold);
     public SuiteForm()
     {
         Text = "KovaUI · Nuevos controles"; Font = demoFont; ClientSize = new Size(880, 690);

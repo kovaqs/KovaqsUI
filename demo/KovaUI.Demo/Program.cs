@@ -104,7 +104,7 @@ internal sealed class DemoForm : Form
         var enabledButton = Button("Enabled sí / no", KButtonVariant.Outline); enabledButton.Width = 170; settings.Controls.Add(enabledButton); samples.Remove(enabledButton);
         enabledButton.Click += (_, _) => { foreach (var control in samples) control.Enabled = !control.Enabled; };
         var fontButton = Button("Fuente 10 / 13", KButtonVariant.Outline); settings.Controls.Add(fontButton); samples.Remove(fontButton);
-        fontButton.Click += (_, _) => { var previous = demoFont; demoFont = KFonts.Outfit(Font.Size < 12 ? 13 : 10); Font = demoFont; foreach (var sample in samples.Where(c => c is not KLabel)) sample.Font = demoFont; previous.Dispose(); };
+        fontButton.Click += (_, _) => { var previous = demoFont; demoFont = KFonts.Inter(Font.Size < 12 ? 13 : 10); Font = demoFont; foreach (var sample in samples.Where(c => c is not KLabel)) sample.Font = demoFont; previous.Dispose(); };
         var inspectButton = Button("Personalizar…", KButtonVariant.Outline); settings.Controls.Add(inspectButton); samples.Remove(inspectButton);
         inspectButton.Click += (_, _) => OpenInspector();
         var suiteButton = Button("Más controles…", KButtonVariant.Outline); settings.Controls.Add(suiteButton); samples.Remove(suiteButton);

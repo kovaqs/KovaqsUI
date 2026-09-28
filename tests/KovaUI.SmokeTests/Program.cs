@@ -16,8 +16,8 @@ internal static class Program
             LicenseManager.CurrentContext = new System.ComponentModel.Design.DesigntimeLicenseContext();
             using var host = new Form();
             host.Controls.AddRange([new KButton(), new KTextBox(), new KCheckBox(), new KRadioButton(), new KComboBox(), new KPanel(), new KProgressBar(), new KLabel()]);
-            bool safe = LicenseManager.UsageMode == LicenseUsageMode.Designtime && host.Controls.Cast<Control>().All(c => c.Font.Name.StartsWith("Outfit"));
-            Console.WriteLine(safe ? "PASS: Outfit inicializa bajo LicenseUsageMode.Designtime en los ocho controles" : "FAIL: tipografía en diseño");
+            bool safe = LicenseManager.UsageMode == LicenseUsageMode.Designtime && host.Controls.Cast<Control>().All(c => c.Font.Name.StartsWith("Inter"));
+            Console.WriteLine(safe ? "PASS: Inter inicializa bajo LicenseUsageMode.Designtime en los ocho controles" : "FAIL: tipografía en diseño");
             return safe ? 0 : 1;
         }
         if (args.Contains("--font-fallback"))
@@ -26,7 +26,7 @@ internal static class Program
             using var button = new KButton();
             using var title = new KLabel { TextRole = KTextRole.Title };
             using var field = new KTextBox();
-            bool safe = !KFonts.OutfitLoaded && button.Font.Name == "Segoe UI" && title.Font.Name == "Segoe UI" && field.Editor.Font.Name == "Segoe UI";
+            bool safe = !KFonts.InterLoaded && button.Font.Name == "Segoe UI" && title.Font.Name == "Segoe UI" && field.Editor.Font.Name == "Segoe UI";
             Console.WriteLine(safe ? "PASS: fallback seguro sin fuentes privadas" : "FAIL: fallback");
             return safe ? 0 : 1;
         }

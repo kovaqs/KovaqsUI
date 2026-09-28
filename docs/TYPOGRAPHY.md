@@ -1,71 +1,76 @@
 # Tipografía integrada
 
-Outfit es la tipografía predeterminada de los ocho controles. Sus cuatro TTF estáticos se incluyen como EmbeddedResource dentro de KovaUI.dll. No se descargan fuentes en ejecución, no se escribe en la carpeta Fonts de Windows y no se requiere instalación ni acceso a Internet. El paquete NuGet contiene la misma DLL.
+Inter es la tipografía predeterminada de los ocho controles de la biblioteca. Sus cuatro archivos TTF estáticos oficiales (junto con los de Outfit para compatibilidad) se incluyen como `EmbeddedResource` dentro de `KovaUI.dll`. No se descargan fuentes en ejecución, no se escribe en la carpeta Fonts de Windows y no se requiere instalación en el sistema operativo ni acceso a Internet. El paquete NuGet contiene la misma DLL y los avisos de licencia correspondientes.
 
 ## API y propiedad de los objetos
 
 ```csharp
 using KovaUI.Styling;
 
-using var regular = KFonts.Outfit(10f, KFontWeight.Regular);
-using var medium = KFonts.Outfit(10f, KFontWeight.Medium);
-using var semibold = KFonts.Outfit(10f, KFontWeight.SemiBold);
-using var bold = KFonts.Outfit(10f, KFontWeight.Bold);
+using var regular = KFonts.Inter(10f, KFontWeight.Regular);
+using var medium = KFonts.Inter(10f, KFontWeight.Medium);
+using var semibold = KFonts.Inter(10f, KFontWeight.SemiBold);
+using var bold = KFonts.Inter(10f, KFontWeight.Bold);
 ```
 
-Cada llamada crea un Font independiente, propiedad del consumidor. No lo deseches mientras un control lo utilice. Si lo asignas a un formulario o control, consérvalo y llama a Dispose después de desechar esos controles, por ejemplo al cerrar el formulario. Los controles no desechan una Font que les hayas asignado. El código de las demos muestra esa propiedad explícita.
+Para compatibilidad, la familia Outfit sigue estando disponible a través de `KFonts.Outfit(size, weight)`.
 
-Los presets también crean un Font independiente en cada acceso. Obtén el preset una vez; no lo solicites desde Paint ni en cada frame:
+Cada llamada crea un `Font` independiente, propiedad del consumidor. No lo deseches mientras un control lo utilice. Si lo asignas a un formulario o control, consérvalo y llama a `Dispose` después de desechar esos controles, por ejemplo al cerrar el formulario. Los controles no desechan una fuente que les hayas asignado manualmente.
 
-| Preset | Tamaño en puntos | Peso |
-|---|---:|---|
-| KTypography.Body | 10 | Regular |
-| KTypography.BodyMedium | 10 | Medium |
-| KTypography.Label | 10 | Medium |
-| KTypography.Button | 10 | Medium |
-| KTypography.Title | 23 | SemiBold |
-| KTypography.Subtitle | 11 | Regular |
-| KTypography.Caption | 9 | Regular |
-| KTypography.Section | 9 | SemiBold |
+Los presets de `KTypography` centralizan la tipografía de la biblioteca y retornan instancias independientes basadas en Inter:
 
-Cada control obtiene y conserva su fuente predeterminada una sola vez, y la desecha con el control. KLabel recrea su fuente propia al cambiar TextRole, sin tocar las fuentes del consumidor. Font sigue siendo editable. Restablecer Font desde Properties, ResetFont() o asignar null recupera el preset. Cambiar de tema no sustituye una fuente personalizada. El preset propio no se serializa como una fuente elegida manualmente.
+| Preset | Tamaño en puntos | Peso | Fuente |
+|---|---:|---|---|
+| KTypography.Body | 10 | Regular | Inter Regular |
+| KTypography.BodyMedium | 10 | Medium | Inter Medium |
+| KTypography.Label | 10 | Medium | Inter Medium |
+| KTypography.Button | 10 | Medium | Inter Medium |
+| KTypography.Title | 23 | SemiBold | Inter SemiBold |
+| KTypography.Subtitle | 11 | Regular | Inter Regular |
+| KTypography.Caption | 9 | Regular | Inter Regular |
+| KTypography.Section | 9 | SemiBold | Inter SemiBold |
 
-KLabel utiliza Label para su rol Body predeterminado, y los presets correspondientes para Title, Subtitle, Caption y Section. KButton utiliza Button; checkbox y radio utilizan Label; campo de texto, combo, panel y progreso utilizan Body.
+Cada control obtiene y conserva su fuente predeterminada una sola vez al instanciarse, y la desecha al destruirse el control. `KLabel` recrea su fuente propia al cambiar `TextRole`, sin alterar las fuentes asignadas explícitamente por el consumidor. La propiedad `Font` sigue siendo completamente editable: restablecer `Font` desde el diseñador (`Properties`), llamar a `ResetFont()` o asignar `null` recupera el preset predeterminado. Cambiar de tema no sustituye una fuente personalizada. El preset propio no se serializa como una propiedad modificada manualmente.
 
-## Carga privada y duración de recursos
+## Gestor centralizado y duración de recursos (KFontManager)
 
-La inicialización es Lazy con ExecutionAndPublication. Existe una sola PrivateFontCollection y se conservan cuatro buffers y cuatro registros GDI durante la vida del proceso. No hay una caché creciente de objetos Font. La creación de fuentes se sincroniza sobre el estado compartido.
+La inicialización está centralizada en `KFontManager` mediante un contenedor `Lazy<FontResources>` thread-safe (`ExecutionAndPublication`).
+Existe una única `PrivateFontCollection` en el proceso y se conservan los buffers no administrados (`Marshal.AllocHGlobal`) y los registros GDI durante la vida del proceso. No hay una caché descontrolada de instancias `Font`.
 
-AddMemoryFont registra las fuentes para GDI+. AddFontMemResourceEx las registra para GDI, TextRenderer y ventanas nativas EDIT/ComboBox. El registro es privado del proceso y Windows lo retira al terminarlo. Se conservan la colección y los buffers mientras puedan existir fuentes o ventanas que los utilicen; no hay un método público de descarga que pueda invalidarlas prematuramente. En una inicialización fallida se liberan los recursos adquiridos y se selecciona el fallback.
+- `AddMemoryFont`: Registra las fuentes en `PrivateFontCollection` para el motor GDI+ (`Graphics.DrawString`).
+- `AddFontMemResourceEx`: Registra las fuentes en GDI para `TextRenderer` y ventanas nativas (`EDIT`, `ComboBox`).
 
-Regular/Bold usan la familia Outfit. Medium y SemiBold usan las familias estáticas Outfit Medium y Outfit SemiBold. Por eso Font.Bold puede ser false para SemiBold: su grosor procede del archivo de esa familia, no de aplicar negrita sintética. Las pruebas verifican los pesos efectivos 400/500/600/700 en GDI.
+El registro es privado del proceso y Windows lo retira al terminarlo. Se conservan la colección y los búferes mientras puedan existir fuentes o ventanas nativas activas que los utilicen. Si la inicialización falla, se liberan los recursos adquiridos y se activa el fallback.
+
+En Inter, Regular y Bold se resuelven sobre la familia `Inter` con `FontStyle.Regular` y `FontStyle.Bold`, mientras que Medium y SemiBold se resuelven sobre las familias estáticas `Inter Medium` e `Inter SemiBold`. Las pruebas en GDI confirman los pesos nativos exactos: 400, 500, 600 y 700.
 
 ## Diseñador y fallback
 
-La misma carga privada se intenta en runtime y en el proceso del diseñador; no requiere que el control tenga Site ni que LicenseManager.UsageMode indique runtime. Los recursos están disponibles desde el ensamblado antes de crear el HWND.
+La carga privada funciona idénticamente en tiempo de ejecución y dentro del proceso del diseñador de Visual Studio; no requiere que el control tenga `Site` ni que `LicenseManager.UsageMode` sea runtime.
 
-Si faltan recursos o la plataforma rechaza su registro, se usa Segoe UI. Si esa familia tampoco existe, System.Drawing realiza su sustitución habitual. OutfitLoaded permite consultar el registro y OutfitLoadError contiene el diagnóstico de carga. Los tamaños y pesos inválidos de la API sí producen ArgumentOutOfRangeException.
+Si las políticas del sistema restringen fuentes privadas o la carga no tiene éxito, la biblioteca activa de forma automática e imperceptible un fallback a **Segoe UI**. Si esta tampoco estuviera presente, el subsistema GDI+ realiza su sustitución habitual.
 
-Un host que restrinja las fuentes privadas puede elegir el fallback antes de crear cualquier control o acceder a KFonts:
+Se dispone de las propiedades de diagnóstico:
+- `KFonts.InterLoaded` y `KFonts.InterLoadError`
+- `KFonts.OutfitLoaded` y `KFonts.OutfitLoadError`
+
+Si se desea desactivar explícitamente las fuentes privadas a nivel de proceso (por ejemplo, para entornos restringidos o pruebas):
 
 ```csharp
 AppContext.SetSwitch("KovaUI.DisableEmbeddedFonts", true);
 ```
 
-La decisión de carga se toma una vez por proceso; para cambiarla es necesario reiniciar. Las fuentes privadas no se enumeran como fuentes instaladas en el selector de Windows. Los controles las usan automáticamente aunque el selector no las liste.
+## DPI y escalado
 
-## DPI
+Las fuentes utilizan `GraphicsUnit.Point`. Windows Forms calcula la conversión a píxeles según el DPI de la ventana (`DeviceDpi`). No se debe multiplicar `Font.Size` por el factor de escala manualmente. Los controles ajustan sus alturas, padding y alineaciones basándose en las métricas de la fuente actual.
 
-Las fuentes utilizan GraphicsUnit.Point. WinForms convierte puntos a píxeles según el DPI de la ventana. No multipliques Font.Size por DeviceDpi/96 al asignarla. El editor nativo mantiene PreferredHeight, y AutoSize/GetPreferredSize miden el texto con la fuente actual. El consumidor debe usar AutoScaleMode apropiado y habilitar PerMonitorV2, como en la Demo.
+Se comprueban métricas a 96, 120, 144 y 192 DPI (100, 125, 150 y 200 %), garantizando escalado proporcional y alineación vertical precisa.
 
-Se comprueban las métricas a 96, 120, 144 y 192 DPI (100/125/150/200 %), además del renderizado y el comportamiento nativo. Estas comprobaciones no afirman una prueba física con cuatro monitores.
+## Distribución y licencias
 
-## Distribución y licencia de la fuente
+Los archivos oficiales de Inter y Outfit se redistribuyen sin alteraciones bajo la **SIL Open Font License 1.1**:
+- Procedencia y hashes SHA-256 en `src/KovaUI/Resources/Fonts/Inter/NOTICE.md` y `Outfit/NOTICE.md`.
+- Archivos `OFL.txt` incluidos en los recursos embebidos y empaquetados en el NuGet bajo `licenses/Inter/` y `licenses/Outfit/`.
+- Licencias consultables en ejecución mediante `KFonts.InterLicense` y `KFonts.OutfitLicense`.
 
-Los archivos oficiales se redistribuyen sin modificaciones. La procedencia y hashes están en Resources/Fonts/Outfit/NOTICE.md dentro del proyecto de biblioteca; OFL.txt conserva el copyright y la licencia originales. Ambos se incluyen en el NuGet bajo licenses/Outfit.
-
-La licencia completa también está embebida en la DLL y es consultable mediante KFonts.OutfitLicense, de modo que viajar sólo con la DLL conserva los avisos. Puedes mostrar esa propiedad en la sección de créditos de tu aplicación. Conserva estos avisos al redistribuir.
-
-La SIL Open Font License 1.1 se aplica a Outfit. No se añade una licencia al código de KovaUI ni se declara la licencia de la fuente como licencia general del paquete.
-
-Fuentes oficiales: [Outfit](https://github.com/Outfitio/Outfit-Fonts/tree/902773808eb372f70fb34e8946dd1ffe604efc79), [OFL original](https://github.com/Outfitio/Outfit-Fonts/blob/902773808eb372f70fb34e8946dd1ffe604efc79/OFL.txt), [registro privado GDI](https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-addfontmemresourceex).
+La licencia SIL OFL aplica exclusivamente a los archivos tipográficos. No altera ni impone licencias sobre el código de KovaUI.

@@ -1,5 +1,14 @@
 # Cambios
 
+## 0.4.0
+
+- Inter integrada como tipografía predeterminada en los ocho controles de la biblioteca, sin requerir instalación en Windows.
+- Inclusión de los cuatro archivos TTF estáticos oficiales (Regular, Medium, SemiBold y Bold) y licencia SIL OFL en recursos incrustados y NuGet.
+- Introducción de KFontManager como gestor centralizado de colecciones privadas y registro dual en memoria para GDI+ y GDI (AddFontMemResourceEx).
+- Exposición de la API KFonts.Inter con resolución de pesos nativos reales (400, 500, 600 y 700), conservando KFonts.Outfit para compatibilidad retroactiva.
+- Actualización de los presets de KTypography a Inter para todos los controles, preservando asignaciones explícitas de la propiedad Font.
+- Verificación exhaustiva de 243 pruebas automáticas cubriendo concurrencia, métricas DPI, diseñador de Visual Studio y fallback seguro a Segoe UI.
+
 ## 0.3.0
 
 - Outfit integrada en la DLL, sin instalación en Windows, en pesos Regular, Medium, SemiBold y Bold.

@@ -11,22 +11,25 @@ internal static class TypographyTests
     {
         using var installed = new InstalledFontCollection();
         var systemFamilies = installed.Families;
-        bool installedOutfit = systemFamilies.Any(f => f.Name.StartsWith("Outfit", StringComparison.Ordinal));
+        bool installedInter = systemFamilies.Any(f => f.Name.StartsWith("Inter", StringComparison.Ordinal));
         foreach (var family in systemFamilies) family.Dispose();
-        Console.WriteLine($"INFO: Outfit installed in Windows: {installedOutfit}");
-        Parallel.For(0, 16, i => { using var f = KFonts.Outfit(10 + i % 3, (KFontWeight)(i % 4)); });
+        Console.WriteLine($"INFO: Inter installed in Windows: {installedInter}");
+
+        Parallel.For(0, 16, i => { using var f = KFonts.Inter(10 + i % 3, (KFontWeight)(i % 4)); });
+        check(KFonts.InterLoaded, "Inter resources load once and support concurrent callers");
         check(KFonts.OutfitLoaded, "Outfit resources load once and support concurrent callers");
+
         foreach (var weight in Enum.GetValues<KFontWeight>())
         {
-            using var font = KFonts.Outfit(10, weight);
+            using var font = KFonts.Inter(10, weight);
             var dc = CreateCompatibleDC(IntPtr.Zero); var handle = font.ToHfont(); var previous = SelectObject(dc, handle);
             try
             {
                 var name = new StringBuilder(128); GetTextFace(dc, name.Capacity, name);
                 GetTextMetrics(dc, out var metrics);
                 int expected = weight switch { KFontWeight.Regular => 400, KFontWeight.Medium => 500, KFontWeight.SemiBold => 600, _ => 700 };
-                check(name.ToString().StartsWith("Outfit") && metrics.Weight == expected,
-                    $"GDI selects the real {weight} face ({name}, weight {metrics.Weight})");
+                check(name.ToString().StartsWith("Inter") && metrics.Weight == expected,
+                    $"GDI selects the real Inter {weight} face ({name}, weight {metrics.Weight})");
             }
             finally { SelectObject(dc, previous); DeleteObject(handle); DeleteDC(dc); }
             foreach (int dpi in new[] { 96, 120, 144, 192 })
@@ -34,7 +37,7 @@ internal static class TypographyTests
                 using var bitmap = new Bitmap(100, 100); bitmap.SetResolution(dpi, dpi);
                 using var graphics = Graphics.FromImage(bitmap);
                 check(font.Unit == GraphicsUnit.Point && Math.Abs(font.GetHeight(graphics) / font.GetHeight(96) - dpi / 96f) < .01f,
-                    $"{weight} point metrics scale at {dpi} DPI");
+                    $"Inter {weight} point metrics scale at {dpi} DPI");
             }
         }
         using var form = new Form();
@@ -43,16 +46,17 @@ internal static class TypographyTests
         foreach (var control in controls)
         {
             var property = TypeDescriptor.GetProperties(control)["Font"]!;
-            check(control.Font.Name.StartsWith("Outfit") && !property.ShouldSerializeValue(control), $"{control.GetType().Name} has a nonserialized Outfit default");
+            check(control.Font.Name.StartsWith("Inter") && !property.ShouldSerializeValue(control), $"{control.GetType().Name} has a nonserialized Inter default");
             using var custom = new Font("Arial", 12);
             control.Font = custom;
             check(property.ShouldSerializeValue(control) && control.Font == custom, $"{control.GetType().Name} preserves a custom Font");
             property.ResetValue(control);
-            check(control.Font.Name.StartsWith("Outfit") && !property.ShouldSerializeValue(control), $"{control.GetType().Name} restores Outfit through designer reset");
+            check(control.Font.Name.StartsWith("Inter") && !property.ShouldSerializeValue(control), $"{control.GetType().Name} restores Inter through designer reset");
         }
         var field = controls.OfType<KTextBox>().Single();
-        check(field.Editor.Font.Equals(field.Font), "native text editor inherits Outfit");
-        check(KFonts.OutfitLicense.Contains("Copyright 2021 The Outfit Project Authors") && KFonts.OutfitLicense.Contains("SIL OPEN FONT LICENSE"), "standalone DLL exposes original font notices");
+        check(field.Editor.Font.Equals(field.Font), "native text editor inherits Inter");
+        check(KFonts.InterLicense.Contains("The Inter Project Authors") && KFonts.InterLicense.Contains("SIL OPEN FONT LICENSE"), "standalone DLL exposes original Inter font notices");
+        check(KFonts.OutfitLicense.Contains("Copyright 2021 The Outfit Project Authors") && KFonts.OutfitLicense.Contains("SIL OPEN FONT LICENSE"), "standalone DLL exposes original Outfit font notices");
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
