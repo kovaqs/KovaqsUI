@@ -1,0 +1,17 @@
+**/bin/
+**/obj/
+.tools/
+.vs/
+artifacts/
+*.user
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.pem
+*.key
+*.publishsettings
+**/secrets.json
+*.suo
+*.log

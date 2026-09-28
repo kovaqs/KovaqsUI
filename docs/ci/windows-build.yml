@@ -1,0 +1,22 @@
+name: Windows build
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet build KovaUI.sln -c Release --nologo
+      - run: dotnet pack src/KovaUI/KovaUI.csproj -c Release -p:IsPackable=true -o artifacts/packages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KovaUI-package
+          path: artifacts/packages/*.nupkg
+      # The smoke suite opens native windows and is run in an interactive Windows session.
