@@ -22,7 +22,7 @@ Alcance autorizado por la sección «Primera tarea» del adjunto: análisis, inf
 | Requisito | Evidencia y límite |
 |---|---|
 | WinForms nativo, sin WPF | Proyectos net8.0-windows/UseWindowsForms; Button y TextBox reales |
-| DLL reutilizable | Proyecto KovaUI, build y pack locales |
+| DLL reutilizable | Proyecto KovaqsUI, build y pack locales |
 | Colores/bordes/radios/formas | API de controles y Appearance; pruebas de formas y tamaños mínimos |
 | Degradados configurables por estado | Pruebas de píxeles para dirección, herencia, Solid y restauración Linear |
 | Teclado y eventos de botón | Pruebas PerformClick, mnemonic, Space, Enter, Escape, deshabilitado |

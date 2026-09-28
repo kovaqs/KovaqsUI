@@ -1,11 +1,11 @@
 # Tipografía integrada
 
-Inter es la tipografía predeterminada de los ocho controles de la biblioteca. Sus cuatro archivos TTF estáticos oficiales (junto con los de Outfit para compatibilidad) se incluyen como `EmbeddedResource` dentro de `KovaUI.dll`. No se descargan fuentes en ejecución, no se escribe en la carpeta Fonts de Windows y no se requiere instalación en el sistema operativo ni acceso a Internet. El paquete NuGet contiene la misma DLL y los avisos de licencia correspondientes.
+Inter es la tipografía predeterminada de los ocho controles de la biblioteca. Sus cuatro archivos TTF estáticos oficiales (junto con los de Outfit para compatibilidad) se incluyen como `EmbeddedResource` dentro de `KovaqsUI.dll`. No se descargan fuentes en ejecución, no se escribe en la carpeta Fonts de Windows y no se requiere instalación en el sistema operativo ni acceso a Internet. El paquete NuGet contiene la misma DLL y los avisos de licencia correspondientes.
 
 ## API y propiedad de los objetos
 
 ```csharp
-using KovaUI.Styling;
+using KovaqsUI.Styling;
 
 using var regular = KFonts.Inter(10f, KFontWeight.Regular);
 using var medium = KFonts.Inter(10f, KFontWeight.Medium);
@@ -57,17 +57,17 @@ Se dispone de las propiedades de diagnóstico:
 Si se desea desactivar explícitamente las fuentes privadas a nivel de proceso (por ejemplo, para entornos restringidos o pruebas):
 
 ```csharp
-AppContext.SetSwitch("KovaUI.DisableEmbeddedFonts", true);
+AppContext.SetSwitch("KovaqsUI.DisableEmbeddedFonts", true);
 ```
 
 ## Preservación tipográfica y prevención de degradación a Microsoft Sans Serif
 
 En Windows Forms estándar, cuando una fuente privada cargada en memoria se reconstruye únicamente a partir de su nombre de texto (por ejemplo `new Font("Inter", 14f)` o mediante el `FontConverter` predeterminado del `PropertyGrid` al cambiar la propiedad `Size`), el subsistema GDI+ busca la familia exclusivamente en el catálogo global de Windows (`C:\Windows\Fonts`). Al no encontrarla instalada a nivel de sistema operativo, GDI+ sustituye silenciosamente la familia por `Microsoft Sans Serif`, reteniendo únicamente `OriginalFontName = "Inter"`.
 
-Para erradicar definitivamente este problema y garantizar una experiencia fluida tanto en tiempo de diseño como en tiempo de ejecución, KovaUI implementa una **doble capa de protección**:
+Para erradicar definitivamente este problema y garantizar una experiencia fluida tanto en tiempo de diseño como en tiempo de ejecución, KovaqsUI implementa una **doble capa de protección**:
 
 1. **Tiempo de diseño y PropertyGrid (`KFontConverter`)**:
-   Todos los controles de KovaUI asocian `[TypeConverter(typeof(KFontConverter))]` a su propiedad `Font`. Cuando el diseñador de Visual Studio o el `PropertyGrid` modifica el tamaño (`Size`), peso (`Bold`) u otras propiedades subordinadas, `KFontConverter.CreateInstance` intercepta la creación y genera la nueva instancia directamente desde la colección privada de `KFontManager`, evitando en origen la degradación a `Microsoft Sans Serif`. Asimismo, `KFontConverter.ConvertFrom` parsea cadenas como `"Inter, 12pt"` de forma determinista.
+   Todos los controles de KovaqsUI asocian `[TypeConverter(typeof(KFontConverter))]` a su propiedad `Font`. Cuando el diseñador de Visual Studio o el `PropertyGrid` modifica el tamaño (`Size`), peso (`Bold`) u otras propiedades subordinadas, `KFontConverter.CreateInstance` intercepta la creación y genera la nueva instancia directamente desde la colección privada de `KFontManager`, evitando en origen la degradación a `Microsoft Sans Serif`. Asimismo, `KFontConverter.ConvertFrom` parsea cadenas como `"Inter, 12pt"` de forma determinista.
 
 2. **Tiempo de ejecución y código generado (`KFontManager.ResolveFont`)**:
    El descriptor de acceso `set` de la propiedad `Font` en los ocho controles (`KButton`, `KTextBox`, `KCheckBox`, `KRadioButton`, `KComboBox`, `KProgressBar`, `KPanel`, `KLabel`) filtra el valor entrante a través de `KFontManager.ResolveFont(value, defaultFont)`. Si el código generado en `InitializeComponent()` (`this.button1.Font = new Font("Inter", 14F)`) o código del consumidor asigna una fuente degradada por GDI+, la biblioteca la detecta automáticamente y reconstruye la instancia utilizando la familia privada en memoria, desechando de inmediato el objeto degradado para no fugar recursos GDI.
@@ -95,8 +95,8 @@ Se comprueban métricas a 96, 120, 144 y 192 DPI (100, 125, 150 y 200 %), garant
 ## Distribución y licencias
 
 Los archivos oficiales de Inter y Outfit se redistribuyen sin alteraciones bajo la **SIL Open Font License 1.1**:
-- Procedencia y hashes SHA-256 en `src/KovaUI/Resources/Fonts/Inter/NOTICE.md` y `Outfit/NOTICE.md`.
+- Procedencia y hashes SHA-256 en `src/KovaqsUI/Resources/Fonts/Inter/NOTICE.md` y `Outfit/NOTICE.md`.
 - Archivos `OFL.txt` incluidos en los recursos embebidos y empaquetados en el NuGet bajo `licenses/Inter/` y `licenses/Outfit/`.
 - Licencias consultables en ejecución mediante `KFonts.InterLicense` y `KFonts.OutfitLicense`.
 
-La licencia SIL OFL aplica exclusivamente a los archivos tipográficos. No altera ni impone licencias sobre el código de KovaUI.
+La licencia SIL OFL aplica exclusivamente a los archivos tipográficos. No altera ni impone licencias sobre el código de KovaqsUI.

@@ -1,5 +1,13 @@
 # Cambios
 
+## 0.5.0
+
+- El proyecto, la solución, la DLL, el paquete y los espacios de nombres pasan a llamarse KovaqsUI.
+- Se actualizan la Demo, las pruebas, la documentación y los nombres internos de los recursos tipográficos.
+- El interruptor `KovaUI.DisableEmbeddedFonts` sigue funcionando como alias de compatibilidad; el nombre recomendado es `KovaqsUI.DisableEmbeddedFonts`.
+- Se estabiliza la carga privada de Outfit cuando GDI+ agrupa temporalmente los nombres de sus pesos y se comprueban los cuatro pesos con GDI.
+- Las aplicaciones consumidoras deben actualizar sus referencias al ensamblado y los `using` al nuevo espacio de nombres.
+
 ## 0.4.1
 
 - Solución integral al problema de sustitución y degradación a "Microsoft Sans Serif" al modificar el tamaño o peso de la fuente en tiempo de diseño y ejecución.

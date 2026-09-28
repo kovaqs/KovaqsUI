@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>WinExe</OutputType><ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode></PropertyGroup>
+  <ItemGroup><ProjectReference Include="../../src/KovaqsUI/KovaqsUI.csproj" /></ItemGroup>
+</Project>

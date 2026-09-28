@@ -1,4 +1,4 @@
-# KovaUI
+# KovaqsUI
 
 Primera versión de una biblioteca de controles **Windows Forms / .NET 8**. Incluye infraestructura compartida y ocho controles: `KButton`, `KTextBox`, `KCheckBox`, `KRadioButton`, `KComboBox`, `KProgressBar`, `KPanel` y `KLabel`. Implementación propia, sin WPF ni dependencias UI externas.
 
@@ -11,23 +11,27 @@ Consulta [Trabajar en otra computadora](docs/GETTING-STARTED.md) para clonar, co
 Windows con SDK .NET 8 y soporte Windows Desktop:
 
 ```powershell
-dotnet build KovaUI.sln -c Release
-dotnet run --project demo/KovaUI.Demo
-dotnet run --project tests/KovaUI.SmokeTests
-dotnet pack src/KovaUI -c Release -p:IsPackable=true -o artifacts/packages
+dotnet build KovaqsUI.sln -c Release
+dotnet run --project demo/KovaqsUI.Demo
+dotnet run --project tests/KovaqsUI.SmokeTests
+dotnet pack src/KovaqsUI -c Release -p:IsPackable=true -o artifacts/packages
 ```
 
 En esta máquina se preparó un SDK local, excluido de Git. `./build.ps1` lo usa automáticamente si no hay `dotnet` en PATH; `./build.ps1 -Demo` ejecuta la Demo después de compilar y probar.
 
 En la Demo, **Personalizar…** abre un inspector sobre los controles reales. Seleccione una muestra y expanda `Appearance` para cambiar Normal/Hover/Pressed/Focused/Disabled, o `FocusAppearance` para ajustar el indicador de foco. También puede editar formas, dimensiones, imágenes y opciones del editor. Los cambios son temporales y permanecen al cerrar el inspector; reiniciar la Demo recupera las muestras iniciales.
 
-La DLL queda en `src/KovaUI/bin/Release/net8.0-windows/KovaUI.dll`. El paquete NuGet no se publica automáticamente.
+La DLL queda en `src/KovaqsUI/bin/Release/net8.0-windows/KovaqsUI.dll`. El paquete NuGet no se publica automáticamente.
+
+## Migración desde KovaUI
+
+Al actualizar una aplicación que use la biblioteca anterior, cambia la referencia al proyecto, DLL o paquete por `KovaqsUI` y los `using KovaUI.*` por `using KovaqsUI.*`. Las clases y sus propiedades mantienen sus nombres y comportamiento. Si desactivabas las fuentes integradas mediante `AppContext.SetSwitch`, usa `KovaqsUI.DisableEmbeddedFonts`; el nombre anterior se acepta como alias.
 
 ## Uso
 
 ```csharp
-using KovaUI.Controls;
-using KovaUI.Styling;
+using KovaqsUI.Controls;
+using KovaqsUI.Styling;
 
 var save = new KButton {
     Text = "&Guardar",
@@ -68,9 +72,9 @@ Los controles no modifican los tokens del tema. Las propiedades locales prevalec
 
 `KTextBox.Appearance.Pressed` se activa al mantener el botón izquierdo del mouse sobre el marco o el editor. Se limpia al soltarlo, perder captura/foco o deshabilitar el campo; no sustituye la selección nativa del texto.
 
-El texto deshabilitado también admite `Appearance.Disabled.ForeColor`. Windows impone `COLOR_GRAYTEXT` en un EDIT deshabilitado ([documentación de Microsoft](https://learn.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorstatic)); KovaUI personaliza únicamente su presentación inactiva. La edición habilitada sigue siendo nativa, y se conservan el HWND, la selección y el carácter de contraseña. Windows dibuja la presentación inactiva en una máscara temporal; KovaUI cambia sus colores respetando la cobertura por canal de ClearType. No reconstruye líneas ni ordena caracteres. El resultado se cachea por control y se libera al invalidarse, cambiar contenido/estilo/desplazamiento, recrear la ventana o habilitar/destruir el editor. Las pruebas comparan alineación izquierda/centro/derecha de texto latino, hebreo y mixto, caracteres aislados, desplazamiento horizontal, varias líneas y contraseña. Estas muestras no sustituyen la validación de todos los idiomas y métodos de entrada.
+El texto deshabilitado también admite `Appearance.Disabled.ForeColor`. Windows impone `COLOR_GRAYTEXT` en un EDIT deshabilitado ([documentación de Microsoft](https://learn.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorstatic)); KovaqsUI personaliza únicamente su presentación inactiva. La edición habilitada sigue siendo nativa, y se conservan el HWND, la selección y el carácter de contraseña. Windows dibuja la presentación inactiva en una máscara temporal; KovaqsUI cambia sus colores respetando la cobertura por canal de ClearType. No reconstruye líneas ni ordena caracteres. El resultado se cachea por control y se libera al invalidarse, cambiar contenido/estilo/desplazamiento, recrear la ventana o habilitar/destruir el editor. Las pruebas comparan alineación izquierda/centro/derecha de texto latino, hebreo y mixto, caracteres aislados, desplazamiento horizontal, varias líneas y contraseña. Estas muestras no sustituyen la validación de todos los idiomas y métodos de entrada.
 
-`KButton` conserva `Button`, `IButtonControl`, `Click`, `PerformClick`, `DialogResult`, `AcceptButton/CancelButton`, mnemonic, Image/ImageList, AutoEllipsis y propiedades estándar de layout. El aspecto usa KovaUI: `FlatAppearance`, `FlatStyle` y `UseVisualStyleBackColor` no definen su dibujo. Al crear la ventana, `FlatStyle.System` se normaliza a `Flat` para conservar el dibujo Kova; por tanto no ofrece el modo visual System del botón estándar. Los cuatro valores heredados están probados para conservar la superficie personalizada y PerformClick. Para dibujo adicional se dispone del evento heredado `Paint` y del método virtual `OnContentPaint`. Los suscriptores de Paint reciben la superficie terminada, tanto desde referencias KButton como Control. Se conserva el ciclo de pintura de Button y se dibuja la superficie propia dentro del mismo doble buffer.
+`KButton` conserva `Button`, `IButtonControl`, `Click`, `PerformClick`, `DialogResult`, `AcceptButton/CancelButton`, mnemonic, Image/ImageList, AutoEllipsis y propiedades estándar de layout. El aspecto usa KovaqsUI: `FlatAppearance`, `FlatStyle` y `UseVisualStyleBackColor` no definen su dibujo. Al crear la ventana, `FlatStyle.System` se normaliza a `Flat` para conservar el dibujo Kova; por tanto no ofrece el modo visual System del botón estándar. Los cuatro valores heredados están probados para conservar la superficie personalizada y PerformClick. Para dibujo adicional se dispone del evento heredado `Paint` y del método virtual `OnContentPaint`. Los suscriptores de Paint reciben la superficie terminada, tanto desde referencias KButton como Control. Se conserva el ciclo de pintura de Button y se dibuja la superficie propia dentro del mismo doble buffer.
 
 `KTextBox` es un contenedor, no una subclase de TextBox. Expone las propiedades comunes y el editor nativo mediante `Editor` para el resto de métodos/eventos. `TabStop` es true por defecto y controla también el editor: Tab/Shift+Tab entran directamente en él, sin una parada adicional en el marco; false omite todo el control. Los degradados sólo afectan al marco del campo; el área de edición es sólida. No destruya `Editor` ni lo quite de Controls.
 
@@ -78,7 +82,7 @@ El enlace de datos se configura sobre `Text` del contenedor mediante `DataBindin
 
 ## Visual Studio
 
-Abra `KovaUI.sln` en una versión de Visual Studio compatible con .NET 8 y la carga de trabajo de escritorio .NET. Referencie el proyecto desde una aplicación WinForms .NET 8. Compile y agregue los controles desde Toolbox (si no aparecen automáticamente, use Choose Items y seleccione la DLL). Las clases son públicas, tienen constructor vacío y `ToolboxItem`; `Appearance` y sus estados exponen serialización de contenido y valores predeterminados para el panel Properties. Las pruebas crean los controles en un DesignSurface real, resuelven sus diseñadores, los inspeccionan con PropertyGrid y serializan/restauran los estilos anidados y el texto con CodeDomComponentSerializationService. El usuario confirmó la carga y edición en Visual Studio; esa validación manual se acepta para esta entrega.
+Abra `KovaqsUI.sln` en una versión de Visual Studio compatible con .NET 8 y la carga de trabajo de escritorio .NET. Referencie el proyecto desde una aplicación WinForms .NET 8. Compile y agregue los controles desde Toolbox (si no aparecen automáticamente, use Choose Items y seleccione la DLL). Las clases son públicas, tienen constructor vacío y `ToolboxItem`; `Appearance` y sus estados exponen serialización de contenido y valores predeterminados para el panel Properties. Las pruebas crean los controles en un DesignSurface real, resuelven sus diseñadores, los inspeccionan con PropertyGrid y serializan/restauran los estilos anidados y el texto con CodeDomComponentSerializationService. El usuario confirmó la carga y edición en Visual Studio; esa validación manual se acepta para esta entrega.
 
 ## Estado
 
@@ -106,7 +110,7 @@ Si Visual Studio informa que no encuentra `Microsoft.NET.Sdk`, ejecute `./open-v
 
 ## Suite ampliada (0.2)
 
-Abra **Más controles…** en la Demo o ejecute `dotnet run --project demo/KovaUI.Demo -- --suite`.
+Abra **Más controles…** en la Demo o ejecute `dotnet run --project demo/KovaqsUI.Demo -- --suite`.
 
 - **KButton**: cursor Hand de forma predeterminada. `PressDepth` controla el desplazamiento vertical del contenido al presionar (0–8 píxeles lógicos, 0 predeterminado). La respuesta predeterminada cambia suavemente la intensidad de la superficie mediante `PressColor` y `PressOpacity`, manteniendo estable el texto. `ClickAnimation` activa una onda de clic recortada por la forma; `ClickColor` define su color (vacío hereda el texto) y `ClickOpacity` su intensidad de 0 a 255. `Animation.Enabled` y `KAnimationSettings.Enabled` permiten desactivar el movimiento.
 - **KCheckBox**: hereda CheckBox, incluidos ThreeState, CheckState, AutoCheck y CheckedChanged. `AppearanceStates` configura estados interactivos; `CheckedState` el relleno, degradado, borde y color de la marca. Se usa ese nombre porque `Appearance` ya es una propiedad nativa del CheckBox.
@@ -139,4 +143,4 @@ La carga privada en memoria se centraliza mediante `KFontManager`, con registro 
 
 Al modificar el tamaño de fuente desde el diseñador de Visual Studio (`PropertyGrid`), código generado o mediante métodos como `font.WithSize(size)` o `font.WithWeight(weight)`, `KFontConverter` y `KFontManager.ResolveFont` preservan automáticamente la familia privada y evitan cualquier sustitución o degradación silenciosa a "Microsoft Sans Serif".
 
-Consulta [tipografía, diseño, DPI y gestión de recursos](docs/TYPOGRAPHY.md), [avisos de Inter](src/KovaUI/Resources/Fonts/Inter/NOTICE.md) y [avisos de Outfit](src/KovaUI/Resources/Fonts/Outfit/NOTICE.md). La licencia SIL OFL corresponde únicamente a los archivos tipográficos.
+Consulta [tipografía, diseño, DPI y gestión de recursos](docs/TYPOGRAPHY.md), [avisos de Inter](src/KovaqsUI/Resources/Fonts/Inter/NOTICE.md) y [avisos de Outfit](src/KovaqsUI/Resources/Fonts/Outfit/NOTICE.md). La licencia SIL OFL corresponde únicamente a los archivos tipográficos.

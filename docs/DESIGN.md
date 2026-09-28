@@ -1,4 +1,4 @@
-# KovaUI · definición visual y técnica
+# KovaqsUI · definición visual y técnica
 
 ## 1. Lectura de la referencia
 
@@ -57,14 +57,14 @@ El padding vertical del botón pequeño se reduce para que el texto no quede cor
 ## 5. Arquitectura mínima
 
 ```text
-src/KovaUI/
+src/KovaqsUI/
   Controls/KButton.cs      hereda Button
   Controls/KTextBox.cs     UserControl + TextBox nativo
   Styling/KTheme.cs        tema inmutable, métricas, variantes y formas
   Styling/KStateStyle.cs   estados editables y serializables
   Drawing/KRenderer.cs    resolución de estados y geometría GDI+
-demo/KovaUI.Demo/          evaluación conjunta
-tests/KovaUI.SmokeTests/   comportamiento, metadatos y recursos
+demo/KovaqsUI.Demo/          evaluación conjunta
+tests/KovaqsUI.SmokeTests/   comportamiento, metadatos y recursos
 ```
 
 No se impone un KControl común que obligue a perder las bases nativas. Se comparte el renderizador, la geometría y el sistema de estilos. Los temas se aplican a un árbol de controles explícitamente, sin registros estáticos que retengan formularios destruidos. Los controles agregados después deben recibir el tema al añadirse o reaplicar `KThemeManager.Apply`.

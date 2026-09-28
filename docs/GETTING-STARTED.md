@@ -5,11 +5,11 @@
 Instala Git y Visual Studio 2022 (17.8 o posterior) con la carga de trabajo **Desarrollo de escritorio de .NET** y el SDK .NET 8. Inicia sesión en GitHub con la cuenta que tiene acceso al repositorio privado y clónalo desde Visual Studio o `git clone` usando su URL HTTPS.
 
 ```powershell
-git clone https://github.com/kovaqs/KovaUI.git
-cd KovaUI
+git clone https://github.com/kovaqs/KovaqsUI.git
+cd KovaqsUI
 ```
 
-Abre `KovaUI.sln` y establece `KovaUI.Demo` como proyecto de inicio. Compila y ejecuta con F5. **Más controles…** abre la galería ampliada; **Personalizar…** permite editar las muestras en vivo. `DesignerSandbox.cs` es el formulario editable para probar el diseñador.
+Abre `KovaqsUI.sln` y establece `KovaqsUI.Demo` como proyecto de inicio. Compila y ejecuta con F5. **Más controles…** abre la galería ampliada; **Personalizar…** permite editar las muestras en vivo. `DesignerSandbox.cs` es el formulario editable para probar el diseñador.
 
 No necesitas el SDK local de esta máquina ni copiar carpetas bin/obj. El repositorio contiene el código fuente completo, los proyectos, recursos y pruebas.
 
@@ -18,30 +18,30 @@ No necesitas el SDK local de esta máquina ni copiar carpetas bin/obj. El reposi
 Desde la carpeta del repositorio, en Windows:
 
 ```powershell
-dotnet build KovaUI.sln -c Release
-dotnet run --project demo/KovaUI.Demo -c Release --no-build
-dotnet run --project demo/KovaUI.Demo -c Release --no-build -- --suite
+dotnet build KovaqsUI.sln -c Release
+dotnet run --project demo/KovaqsUI.Demo -c Release --no-build
+dotnet run --project demo/KovaqsUI.Demo -c Release --no-build -- --suite
 ```
 
 Para las pruebas de comportamiento, usa una sesión de escritorio de Windows:
 
 ```powershell
-dotnet run --project tests/KovaUI.SmokeTests -c Release --no-build
+dotnet run --project tests/KovaqsUI.SmokeTests -c Release --no-build
 ```
 
 Las pruebas abren ventanas temporales. No necesitan automatizar Visual Studio. Para generar el paquete local:
 
 ```powershell
-dotnet pack src/KovaUI/KovaUI.csproj -c Release -p:IsPackable=true -o artifacts/packages
+dotnet pack src/KovaqsUI/KovaqsUI.csproj -c Release -p:IsPackable=true -o artifacts/packages
 ```
 
 ## Usar los controles en tu aplicación
 
-En un proyecto WinForms .NET 8, agrega una referencia al proyecto `src/KovaUI/KovaUI.csproj`, o a la DLL compilada en `src/KovaUI/bin/Release/net8.0-windows/KovaUI.dll`. También puedes instalar el paquete generado desde una fuente NuGet local.
+En un proyecto WinForms .NET 8, agrega una referencia al proyecto `src/KovaqsUI/KovaqsUI.csproj`, o a la DLL compilada en `src/KovaqsUI/bin/Release/net8.0-windows/KovaqsUI.dll`. También puedes instalar el paquete generado desde una fuente NuGet local.
 
 ```csharp
-using KovaUI.Controls;
-using KovaUI.Styling;
+using KovaqsUI.Controls;
+using KovaqsUI.Styling;
 
 var button = new KButton { Text = "Guardar", Width = 160 };
 button.FillColor = Color.SlateBlue;

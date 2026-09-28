@@ -7,8 +7,8 @@ Esta guía registra comprobaciones no cubiertas por la ejecución automática. N
 
 Requisito: Visual Studio con soporte .NET 8 y carga de trabajo de desarrollo de escritorio .NET. La instalación actual se identifica como Visual Studio Community 2026 (18.10); falta completar la prueba directa del diseñador.
 
-1. Abrir KovaUI.sln y compilar Release.
-2. Crear una aplicación Windows Forms .NET 8 de prueba y agregar referencia al proyecto KovaUI.
+1. Abrir KovaqsUI.sln y compilar Release.
+2. Crear una aplicación Windows Forms .NET 8 de prueba y agregar referencia al proyecto KovaqsUI.
 3. Abrir Form1 en el diseñador. Confirmar KButton y KTextBox en Toolbox; si no aparecen automáticamente, registrar el resultado de Choose Items con la DLL compilada.
 4. Arrastrar ambos controles. Verificar tamaño, selección, movimiento, alineación, Dock y Anchor, sin excepciones del diseñador.
 5. Editar Appearance.Normal, Hover, Pressed, Focused y Disabled. Probar colores arbitrarios, GradientColor, GradientAngle y GradientMode.
@@ -54,7 +54,7 @@ Las diferencias visuales deliberadas están documentadas en README.md: KTextBox 
 
 Visual Studio Community 2026 abrió `DesignerSandbox.cs [Diseño]` con `actionButton` y `nameField`. El árbol accesible del IDE muestra el botón «Continuar» y un solo editor nativo bajo el campo. La lista de errores muestra cero errores y cero advertencias. El guardado mediante Ctrl+S quitó la marca de cambios y generó InitializeComponent en DesignerSandbox.Designer.cs. Se conservaron los ajustes hechos por el usuario en tamaño, posición y TabStop.
 
-Toolbox muestra el grupo KovaUI con `KButton (KovaUI.Controls)` y `KTextBox (KovaUI.Controls)`. Esto verifica descubrimiento en el IDE. Aún no verifica inserción por arrastre, edición y reapertura de todas las propiedades anidadas. La captura gráfica del escritorio sigue fallando (`FrameArrived timed out`); la evidencia anterior procede del árbol de accesibilidad y de los archivos guardados, no de una inspección visual por captura.
+Toolbox muestra el grupo KovaqsUI con `KButton (KovaqsUI.Controls)` y `KTextBox (KovaqsUI.Controls)`. Esto verifica descubrimiento en el IDE. Aún no verifica inserción por arrastre, edición y reapertura de todas las propiedades anidadas. La captura gráfica del escritorio sigue fallando (`FrameArrived timed out`); la evidencia anterior procede del árbol de accesibilidad y de los archivos guardados, no de una inspección visual por captura.
 
 Se corrigió el metadato predeterminado de KTextBox.TabStop a true, coincidiendo con el constructor. La prueba de TypeDescriptor verifica que Restablecer recupera true y sincroniza el editor interno. Suite actual: 160 comprobaciones aprobadas.
 
@@ -66,7 +66,7 @@ El archivo DesignerSandbox.Designer.cs guardado contiene dos instancias adiciona
 
 ### Guardado de propiedades anidadas confirmado
 
-Tras la edición del usuario, DesignerSandbox.Designer.cs contiene `kButton1.Animation.Duration = 180`, `kButton1.Animation.Easing = Styling.KEasing.Linear` y `kButton1.Appearance.Normal.BorderColor = Color.Black`. Visual Studio muestra la pestaña sin cambios pendientes y Properties identifica kButton1 como KovaUI.Controls.KButton. La solución con ese código compila Release con cero errores y advertencias. Queda confirmado el guardado real desde Properties de Animation y Appearance; no sólo el despliegue de sus categorías.
+Tras la edición del usuario, DesignerSandbox.Designer.cs contiene `kButton1.Animation.Duration = 180`, `kButton1.Animation.Easing = Styling.KEasing.Linear` y `kButton1.Appearance.Normal.BorderColor = Color.Black`. Visual Studio muestra la pestaña sin cambios pendientes y Properties identifica kButton1 como KovaqsUI.Controls.KButton. La solución con ese código compila Release con cero errores y advertencias. Queda confirmado el guardado real desde Properties de Animation y Appearance; no sólo el despliegue de sus categorías.
 
 Se cerró la pestaña de diseñador mediante Ctrl+F4 para probar recarga. La selección posterior del archivo falló con `coordinate input geometry is unavailable`, por lo que la reapertura todavía no se declara verificada. No se modificaron los valores elegidos por el usuario.
 

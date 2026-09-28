@@ -12,7 +12,7 @@ try {
         $env:DOTNET_ROOT = $sdkDirectory
         $env:PATH = "$sdkDirectory;$previousPath"
     }
-    $solution = Join-Path $PSScriptRoot 'KovaUI.sln'
+    $solution = Join-Path $PSScriptRoot 'KovaqsUI.sln'
     Start-Process -FilePath (Join-Path $installation 'Common7\IDE\devenv.exe') -ArgumentList ('"' + $solution + '"') -WindowStyle Normal
 }
 finally {
