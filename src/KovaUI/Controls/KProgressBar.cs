@@ -13,12 +13,18 @@ public class KProgressBar : ProgressBar, IKThemeControl
     private readonly KScalarTransition transition;
     private int radius = 8, border;
     private long marqueeStart = Stopwatch.GetTimestamp();
+    private Font? defaultFont;
+    [System.Diagnostics.CodeAnalysis.AllowNull]
+    public override Font Font { get => base.Font; set => base.Font = value ?? defaultFont; }
+    public override void ResetFont() => Font = null;
+    private bool ShouldSerializeFont() => !Equals(Font, defaultFont);
     public KProgressBar()
     {
         SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
         Size = new Size(260, 12);
         transition = new(this);
         Track.Changed += Changed; Fill.Changed += Changed;
+        base.Font = defaultFont = KTypography.Body;
     }
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public KTheme Theme { get => theme; set { theme = value ?? throw new ArgumentNullException(nameof(value)); Invalidate(); } }
@@ -74,8 +80,5 @@ public class KProgressBar : ProgressBar, IKThemeControl
         else Invalidate();
     }
     protected override void OnVisibleChanged(EventArgs e) { base.OnVisibleChanged(e); if (!Visible) KAnimationClock.Remove(Tick); else Invalidate(); }
-    protected override void Dispose(bool disposing) { if (disposing) { KAnimationClock.Remove(Tick); transition.Dispose(); Track.Changed -= Changed; Fill.Changed -= Changed; } base.Dispose(disposing); }
+    protected override void Dispose(bool disposing) { if (disposing) { KAnimationClock.Remove(Tick); transition.Dispose(); Track.Changed -= Changed; Fill.Changed -= Changed; } base.Dispose(disposing); if (disposing) { defaultFont?.Dispose(); defaultFont = null; } }
 }
-
-
-

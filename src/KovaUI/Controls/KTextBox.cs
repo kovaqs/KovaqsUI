@@ -18,6 +18,11 @@ public class KTextBox : UserControl, IKThemeControl
     private bool hover, pressed;
     private Rectangle leftBounds, rightBounds;
     private Color normalForeColor;
+    private Font? defaultFont;
+    [System.Diagnostics.CodeAnalysis.AllowNull]
+    public override Font Font { get => base.Font; set => base.Font = value ?? defaultFont; }
+    public override void ResetFont() => Font = null;
+    private bool ShouldSerializeFont() => !Equals(Font, defaultFont);
     public KTextBox()
     {
         SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
@@ -45,6 +50,7 @@ public class KTextBox : UserControl, IKThemeControl
         Appearance.Changed += AppearanceChanged;
         FocusAppearance.Changed += AppearanceChanged;
         LayoutEditor(); RefreshStyle();
+        base.Font = defaultFont = KTypography.Body;
     }
     private void AppearanceChanged(object? sender, EventArgs e)
     {
@@ -245,11 +251,6 @@ public class KTextBox : UserControl, IKThemeControl
     protected override void Dispose(bool disposing)
     {
         if (disposing) { transition?.Dispose(); Appearance.Changed -= AppearanceChanged; FocusAppearance.Changed -= AppearanceChanged; }
-        base.Dispose(disposing);
+        base.Dispose(disposing); if (disposing) { defaultFont?.Dispose(); defaultFont = null; }
     }
 }
-
-
-
-
-

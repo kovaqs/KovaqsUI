@@ -7,3 +7,4 @@
 - No subir credenciales, certificados, claves, datos personales, configuraciones locales, herramientas descargadas ni binarios de terceros.
 - Mantener el repositorio privado salvo instrucción explícita del propietario.
 - Conservar el comportamiento nativo de WinForms y la personalización de colores, formas y animaciones.
+- Excepción autorizada: incluir los cuatro TTF oficiales de Outfit y sus avisos SIL OFL intactos como recursos tipográficos. Su licencia corresponde sólo a la fuente.

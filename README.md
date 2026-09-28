@@ -127,6 +127,12 @@ La comprobación manual del diseñador realizada por el usuario se acepta. No se
 
 Los títulos y textos de las demos ahora usan KLabel, disponible en la misma DLL y en el Toolbox. Hereda de Label y conserva AutoSize, AutoEllipsis, TextAlign, Image, UseMnemonic, Padding y el comportamiento nativo.
 
-TextRole ofrece Body (10 pt), Title (23 pt negrita), Subtitle (11 pt), Caption (9 pt) y Section (9 pt negrita), con Segoe UI. Font y ForeColor siguen siendo editables: los valores explícitos se conservan al cambiar el tema o el rol. Restablecer Font recupera la tipografía del rol; restablecer ForeColor recupera el color del tema. El fondo es transparente por defecto. Las muestras se pueden editar desde Personalizar….
+TextRole ofrece Body, Title, Subtitle, Caption y Section con los presets de KTypography y Outfit integrada. Font y ForeColor siguen siendo editables: los valores explícitos se conservan al cambiar el tema o el rol. Restablecer Font recupera la tipografía del rol; restablecer ForeColor recupera el color del tema. El fondo es transparente por defecto. Las muestras se pueden editar desde Personalizar….
 
+## Outfit integrada (0.3)
 
+Todos los controles utilizan Outfit sin instalar fuentes en Windows. Los cuatro pesos estáticos y los avisos originales de la fuente viajan dentro de la DLL; el paquete incluye también los avisos como archivos. La carga privada se realiza una sola vez y dispone de fallback Segoe UI.
+
+`KFonts.Outfit(10f, KFontWeight.Medium)` crea una fuente propia del consumidor. `KTypography` centraliza los presets Body, BodyMedium, Label, Button, Title y Caption. Cada resultado es un Font independiente que debe desecharse cuando ya no lo utilicen los controles. No solicites presets en Paint.
+
+Consulta [tipografía, diseño, DPI y gestión de recursos](docs/TYPOGRAPHY.md) y [avisos de Outfit](src/KovaUI/Resources/Fonts/Outfit/NOTICE.md). La licencia de Outfit corresponde únicamente a los archivos tipográficos.

@@ -78,16 +78,15 @@ public class KLabel : Label, IKThemeControl
 
     private void ApplyTypography()
     {
-        var (size, style) = textRole switch
-        {
-            KTextRole.Title => (23f, FontStyle.Bold),
-            KTextRole.Subtitle => (11f, FontStyle.Regular),
-            KTextRole.Caption => (9f, FontStyle.Regular),
-            KTextRole.Section => (9f, FontStyle.Bold),
-            _ => (10f, FontStyle.Regular)
-        };
         var previous = roleFont;
-        roleFont = new Font("Segoe UI", size, style);
+        roleFont = textRole switch
+        {
+            KTextRole.Title => KTypography.Title,
+            KTextRole.Subtitle => KTypography.Subtitle,
+            KTextRole.Caption => KTypography.Caption,
+            KTextRole.Section => KTypography.Section,
+            _ => KTypography.Label
+        };
         base.Font = roleFont;
         previous?.Dispose();
     }
@@ -98,4 +97,3 @@ public class KLabel : Label, IKThemeControl
         if (disposing) { roleFont?.Dispose(); roleFont = null; }
     }
 }
-

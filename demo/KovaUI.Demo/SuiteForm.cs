@@ -11,9 +11,11 @@ internal sealed class SuiteForm : Form
     private readonly KLabel value;
     private int quantity = 3;
     private bool dark;
+    private readonly Font demoFont = KTypography.Body;
+    private readonly Font counterFont = KFonts.Outfit(13, KFontWeight.SemiBold);
     public SuiteForm()
     {
-        Text = "KovaUI · Nuevos controles"; Font = new Font("Segoe UI", 10); ClientSize = new Size(880, 690);
+        Text = "KovaUI · Nuevos controles"; Font = demoFont; ClientSize = new Size(880, 690);
         AutoScaleMode = AutoScaleMode.Dpi; BackColor = KTheme.Light.Background;
         var title = new KLabel { Text = "Una familia, más posibilidades.", TextRole = KTextRole.Title, AutoSize = true, Location = new Point(32, 25) };
         var intro = new KLabel { Text = "Selección nativa · movimiento discreto · todos los colores editables", AutoSize = true, Location = new Point(35, 80), TextRole = KTextRole.Subtitle };
@@ -38,7 +40,7 @@ internal sealed class SuiteForm : Form
         card.Controls.Add(stepper); samples.Add(stepper);
         var minus = new KButton { Text = "−", Variant = KButtonVariant.Ghost, BorderThickness = 0, Location = new Point(5, 5), Size = new Size(60, 48), CornerRadius = 14, AccessibleName = "Disminuir cantidad" };
         var plus = new KButton { Text = "+", Variant = KButtonVariant.Ghost, BorderThickness = 0, Location = new Point(166, 5), Size = new Size(60, 48), CornerRadius = 14, AccessibleName = "Aumentar cantidad" };
-        value = new KLabel { AutoSize = false, Text = "3", TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Segoe UI", 13, FontStyle.Bold), Location = new Point(68, 5), Size = new Size(96, 48), BackColor = Color.Transparent };
+        value = new KLabel { AutoSize = false, Text = "3", TextAlign = ContentAlignment.MiddleCenter, Font = counterFont, Location = new Point(68, 5), Size = new Size(96, 48), BackColor = Color.Transparent };
         stepper.Controls.AddRange([minus, value, plus]); samples.AddRange([minus, value, plus]);
         stepper.Paint += (_, e) => { using var pen = new Pen(stepper.Theme.Border); e.Graphics.DrawLine(pen, 67, 13, 67, 44); e.Graphics.DrawLine(pen, 164, 13, 164, 44); };
         minus.Click += (_, _) => { quantity = Math.Max(0, quantity - 1); value.Text = quantity.ToString(); };
@@ -61,6 +63,7 @@ internal sealed class SuiteForm : Form
         Controls.AddRange([customize, themeButton, motion]); ApplyTheme();
     }
     private void AddLabel(string text, int x, int y) { var label = new KLabel { Text = text, TextRole = text.Length < 20 ? KTextRole.Section : KTextRole.Caption, Location = new Point(x, y) }; card.Controls.Add(label); samples.Add(label); }
+    protected override void Dispose(bool disposing) { base.Dispose(disposing); if (disposing) { demoFont.Dispose(); counterFont.Dispose(); } }
     internal void ApplyDark() { dark = true; ApplyTheme(); }
     private void ApplyTheme()
     {
@@ -68,5 +71,3 @@ internal sealed class SuiteForm : Form
         KThemeManager.Apply(this, theme); ForeColor = theme.TextPrimary;
     }
 }
-
-

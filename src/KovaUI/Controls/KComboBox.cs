@@ -17,6 +17,11 @@ public class KComboBox : ComboBox, IKThemeControl
     private float arrowSize = 7, arrowThickness = 1.5f;
     private bool hover;
     private int radius = 8, border = 1;
+    private Font? defaultFont;
+    [System.Diagnostics.CodeAnalysis.AllowNull]
+    public override Font Font { get => base.Font; set => base.Font = value ?? defaultFont; }
+    public override void ResetFont() => Font = null;
+    private bool ShouldSerializeFont() => !Equals(Font, defaultFont);
     public KComboBox()
     {
         base.DrawMode = DrawMode.OwnerDrawFixed;
@@ -24,6 +29,7 @@ public class KComboBox : ComboBox, IKThemeControl
         ItemHeight = 28; Size = new Size(240, 36);
         Appearance.Changed += Changed; ItemAppearance.Changed += Changed; SelectedItemAppearance.Changed += Changed;
         Changed(this, EventArgs.Empty);
+        base.Font = defaultFont = KTypography.Body;
     }
     [Category("Kova Appearance"), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)] public KAppearance Appearance { get; } = new();
     [Category("Kova Appearance"), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)] public KStateStyle ItemAppearance { get; } = new();
@@ -141,8 +147,5 @@ public class KComboBox : ComboBox, IKThemeControl
     protected override void OnLostFocus(EventArgs e) { base.OnLostFocus(e); Invalidate(); }
     protected override void OnDropDown(EventArgs e) { base.OnDropDown(e); Invalidate(); }
     protected override void OnDropDownClosed(EventArgs e) { base.OnDropDownClosed(e); Invalidate(); }
-    protected override void Dispose(bool disposing) { if (disposing) { transition?.Dispose(); arrowTransition?.Dispose(); Appearance.Changed -= Changed; ItemAppearance.Changed -= Changed; SelectedItemAppearance.Changed -= Changed; } base.Dispose(disposing); }
+    protected override void Dispose(bool disposing) { if (disposing) { transition?.Dispose(); arrowTransition?.Dispose(); Appearance.Changed -= Changed; ItemAppearance.Changed -= Changed; SelectedItemAppearance.Changed -= Changed; } base.Dispose(disposing); if (disposing) { defaultFont?.Dispose(); defaultFont = null; } }
 }
-
-
-

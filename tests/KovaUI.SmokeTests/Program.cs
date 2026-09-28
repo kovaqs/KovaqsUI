@@ -8,9 +8,28 @@ internal static class Program
     private static int checks;
     [DllImport("user32.dll")] private static extern int GetGuiResources(IntPtr process, uint flags);
     [STAThread]
-    private static int Main()
+    private static int Main(string[] args)
     {
         ApplicationConfiguration.Initialize();
+        if (args.Contains("--font-design"))
+        {
+            LicenseManager.CurrentContext = new System.ComponentModel.Design.DesigntimeLicenseContext();
+            using var host = new Form();
+            host.Controls.AddRange([new KButton(), new KTextBox(), new KCheckBox(), new KRadioButton(), new KComboBox(), new KPanel(), new KProgressBar(), new KLabel()]);
+            bool safe = LicenseManager.UsageMode == LicenseUsageMode.Designtime && host.Controls.Cast<Control>().All(c => c.Font.Name.StartsWith("Outfit"));
+            Console.WriteLine(safe ? "PASS: Outfit inicializa bajo LicenseUsageMode.Designtime en los ocho controles" : "FAIL: tipografía en diseño");
+            return safe ? 0 : 1;
+        }
+        if (args.Contains("--font-fallback"))
+        {
+            AppContext.SetSwitch("KovaUI.DisableEmbeddedFonts", true);
+            using var button = new KButton();
+            using var title = new KLabel { TextRole = KTextRole.Title };
+            using var field = new KTextBox();
+            bool safe = !KFonts.OutfitLoaded && button.Font.Name == "Segoe UI" && title.Font.Name == "Segoe UI" && field.Editor.Font.Name == "Segoe UI";
+            Console.WriteLine(safe ? "PASS: fallback seguro sin fuentes privadas" : "FAIL: fallback");
+            return safe ? 0 : 1;
+        }
         KAnimationSettings.Enabled = false;
         try
         {
@@ -84,6 +103,7 @@ internal static class Program
             DpiRegressionTests.Run(Check);
             TextPointerStateTests.Run(Check);
             AnimationRegressionTests.Run(Check);
+            TypographyTests.Run(Check);
             SuiteRegressionTests.Run(Check);
             Console.WriteLine($"PASS: {checks} checks; 2000 renders in {watch.ElapsedMilliseconds} ms. Size scaling is not a physical per-monitor DPI test.");
             form.Close(); return 0;
@@ -98,6 +118,3 @@ internal static class Program
     }
     private sealed class TestForm : Form { public bool DialogKey(Keys key) => ProcessDialogKey(key); }
 }
-
-
-

@@ -39,12 +39,13 @@ internal sealed class DemoForm : Form
     private readonly FlowLayoutPanel content = new() { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, AutoScroll = true, Padding = new Padding(36, 28, 36, 24) };
     private readonly List<Control> samples = [];
     private readonly List<Image> ownedImages = [];
+    private Font demoFont = KTypography.Body;
     private bool dark;
     private AppearanceInspector? inspector;
     public DemoForm()
     {
         Text = "KovaUI · Control sandbox";
-        Font = new Font("Segoe UI", 10f);
+        Font = demoFont;
         ClientSize = new Size(1030, 870);
         MinimumSize = new Size(780, 640);
         AutoScaleMode = AutoScaleMode.Dpi;
@@ -103,7 +104,7 @@ internal sealed class DemoForm : Form
         var enabledButton = Button("Enabled sí / no", KButtonVariant.Outline); enabledButton.Width = 170; settings.Controls.Add(enabledButton); samples.Remove(enabledButton);
         enabledButton.Click += (_, _) => { foreach (var control in samples) control.Enabled = !control.Enabled; };
         var fontButton = Button("Fuente 10 / 13", KButtonVariant.Outline); settings.Controls.Add(fontButton); samples.Remove(fontButton);
-        fontButton.Click += (_, _) => { var previous = Font; Font = new Font("Segoe UI", Font.Size < 12 ? 13 : 10); previous.Dispose(); };
+        fontButton.Click += (_, _) => { var previous = demoFont; demoFont = KFonts.Outfit(Font.Size < 12 ? 13 : 10); Font = demoFont; foreach (var sample in samples.Where(c => c is not KLabel)) sample.Font = demoFont; previous.Dispose(); };
         var inspectButton = Button("Personalizar…", KButtonVariant.Outline); settings.Controls.Add(inspectButton); samples.Remove(inspectButton);
         inspectButton.Click += (_, _) => OpenInspector();
         var suiteButton = Button("Más controles…", KButtonVariant.Outline); settings.Controls.Add(suiteButton); samples.Remove(suiteButton);
@@ -123,7 +124,7 @@ internal sealed class DemoForm : Form
     }
     private void AddLabel(string text, float size, bool bold = false)
     {
-        var label = new KLabel { Text = text, TextRole = size >= 20 ? KTextRole.Title : bold ? KTextRole.Section : KTextRole.Subtitle, Font = new Font("Segoe UI", size, bold ? FontStyle.Bold : FontStyle.Regular), Margin = new Padding(0, 0, 0, size < 10 ? 10 : 14) }; content.Controls.Add(label); samples.Add(label);
+        var label = new KLabel { Text = text, TextRole = size >= 20 ? KTextRole.Title : bold ? KTextRole.Section : KTextRole.Subtitle, Margin = new Padding(0, 0, 0, size < 10 ? 10 : 14) }; content.Controls.Add(label); samples.Add(label);
     }
     private Image CreateDemoIcon(string glyph, Color color)
     {
@@ -134,7 +135,7 @@ internal sealed class DemoForm : Form
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        if (disposing) { foreach (var image in ownedImages) image.Dispose(); ownedImages.Clear(); }
+        if (disposing) { foreach (var image in ownedImages) image.Dispose(); ownedImages.Clear(); demoFont.Dispose(); }
     }
     private FlowLayoutPanel Row()
     {
@@ -162,7 +163,3 @@ internal sealed class DemoForm : Form
     public void SetDark() { dark = true; ApplyTheme(); }
 
 }
-
-
-
-

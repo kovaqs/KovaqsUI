@@ -18,6 +18,11 @@ public class KButton : Button, IKThemeControl
     private int radius = KMetrics.RadiusMedium, border = 1, gap = KMetrics.SpaceS;
     private Size imageSize = new(18, 18);
     private Color normalForeColor;
+    private Font? defaultFont;
+    [System.Diagnostics.CodeAnalysis.AllowNull]
+    public override Font Font { get => base.Font; set => base.Font = value ?? defaultFont; }
+    public override void ResetFont() => Font = null;
+    private bool ShouldSerializeFont() => !Equals(Font, defaultFont);
     public KButton()
     {
         SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
@@ -30,6 +35,7 @@ public class KButton : Button, IKThemeControl
         // Register first so consumer Paint handlers receive the finished Kova face.
         // Keep Button's paint lifecycle, including its inherited Control.Paint event.
         base.Paint += PaintFace;
+        base.Font = defaultFont = KTypography.Button;
     }
     protected override Cursor DefaultCursor => Cursors.Hand;
     private float pressDepth;
@@ -249,11 +255,6 @@ public class KButton : Button, IKThemeControl
     protected override void Dispose(bool disposing)
     {
         if (disposing) { transition?.Dispose(); pressMotion?.Dispose(); clickMotion?.Dispose(); Appearance.Changed -= AppearanceChanged; FocusAppearance.Changed -= AppearanceChanged; base.Paint -= PaintFace; }
-        base.Dispose(disposing);
+        base.Dispose(disposing); if (disposing) { defaultFont?.Dispose(); defaultFont = null; }
     }
 }
-
-
-
-
-

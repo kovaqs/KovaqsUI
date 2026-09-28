@@ -1,5 +1,13 @@
 # Cambios
 
+## 0.3.0
+
+- Outfit integrada en la DLL, sin instalación en Windows, en pesos Regular, Medium, SemiBold y Bold.
+- KFonts y presets centralizados KTypography; valores Font personalizados conservados.
+- Carga privada única para GDI/GDI+, con fallback Segoe UI y soporte de inicialización en diseño.
+- Avisos y licencia originales de la fuente incluidos en recursos y NuGet.
+- Demos actualizadas y comprobaciones de pesos nativos, métricas DPI, serialización y fallback.
+
 ## 0.2.0
 
 - Suite de ocho controles: KButton, KTextBox, KCheckBox, KRadioButton, KComboBox, KProgressBar, KPanel y KLabel.
@@ -14,4 +22,3 @@
 - Demos con inspector de propiedades, formulario de diseñador y guía para otra computadora.
 
 La suite implementa un lenguaje visual propio. Las diferencias intencionales respecto al dibujo de los controles clásicos se describen en README.md.
-

@@ -1,13 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>KovaUI</PackageId>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Description>Configurable, native Windows Forms controls.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
   <ItemGroup><None Include="../../README.md" Pack="true" PackagePath="/" /></ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources/Fonts/Outfit/*.ttf" LogicalName="KovaUI.Fonts.Outfit.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Resources/Fonts/Outfit/OFL.txt" LogicalName="KovaUI.Fonts.Outfit.OFL.txt" />
+    <None Update="Resources/Fonts/Outfit/OFL.txt" Pack="true" PackagePath="licenses/Outfit/OFL.txt" />
+    <None Update="Resources/Fonts/Outfit/NOTICE.md" Pack="true" PackagePath="licenses/Outfit/NOTICE.md" />
+  </ItemGroup>
 </Project>
-
-

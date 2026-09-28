@@ -11,11 +11,17 @@ public class KPanel : Panel, IKThemeControl
     private KTheme theme = KTheme.Light;
     private int radius = 12, border = 1;
     private Bitmap? shadowCache;
+    private Font? defaultFont;
+    [System.Diagnostics.CodeAnalysis.AllowNull]
+    public override Font Font { get => base.Font; set => base.Font = value ?? defaultFont; }
+    public override void ResetFont() => Font = null;
+    private bool ShouldSerializeFont() => !Equals(Font, defaultFont);
     public KPanel()
     {
         SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
         BackColor = Color.Transparent; Padding = new Padding(12); Size = new Size(300, 160);
         Surface.Changed += Changed; Shadow.Changed += ShadowChanged;
+        base.Font = defaultFont = KTypography.Body;
     }
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public KTheme Theme { get => theme; set { theme = value ?? throw new ArgumentNullException(nameof(value)); Invalidate(); } }
@@ -58,6 +64,5 @@ public class KPanel : Panel, IKThemeControl
         KRenderer.Surface(e.Graphics, r, style, radius * scale, border * scale, KShape.Rounded, scale, Color.Empty);
         base.OnPaint(e);
     }
-    protected override void Dispose(bool disposing) { if (disposing) { shadowCache?.Dispose(); Surface.Changed -= Changed; Shadow.Changed -= ShadowChanged; } base.Dispose(disposing); }
+    protected override void Dispose(bool disposing) { if (disposing) { shadowCache?.Dispose(); Surface.Changed -= Changed; Shadow.Changed -= ShadowChanged; } base.Dispose(disposing); if (disposing) { defaultFont?.Dispose(); defaultFont = null; } }
 }
-

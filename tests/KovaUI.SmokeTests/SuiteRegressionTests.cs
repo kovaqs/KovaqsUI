@@ -9,7 +9,7 @@ internal static class SuiteRegressionTests
         using (var label = new KLabel { Text = "Título", TextRole = KTextRole.Title })
         {
             var properties = System.ComponentModel.TypeDescriptor.GetProperties(label);
-            check(label.AutoSize && label.Font.Bold && !properties["Font"]!.ShouldSerializeValue(label)
+            check(label.AutoSize && label.Font.Name == "Outfit SemiBold" && !properties["Font"]!.ShouldSerializeValue(label)
                 && !properties["ForeColor"]!.ShouldSerializeValue(label), "label role defaults do not serialize as custom overrides");
             using var customFont = new Font("Arial", 14);
             label.Font = customFont; label.ForeColor = Color.Coral;
@@ -151,5 +151,3 @@ internal static class SuiteRegressionTests
         form.Close();
     }
 }
-
-
